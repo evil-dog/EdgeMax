@@ -198,16 +198,33 @@ def yesno(*args):
         else:
             sys.stdout.write("Answer must be either y or n.\n")
 
+def sub_vars(var_str):
+    for case in switch(var_str):
+        if case('$all_zones'):
+            return all_zones
+            break
+
+        if case('$all_groups'):
+            return all_groups
+            break
+
+
 def build_rule(src_zone, dst_zone, params, ipversions = [4, 6], rulenum=None):
     '''
     Build a rule for each applicable zone direction and IP version
     '''
     # If zones are passed as simple strings, convert to tuples
     if isinstance(src_zone, str):
-        src_zone                                        = (src_zone,)
+        if src_zone[:1] == "$":
+            src_zone = sub_vars(src_zone)
+        else:
+            src_zone                                        = (src_zone,)
 
     if isinstance(dst_zone, str):
-        dst_zone                                          = (dst_zone,)
+        if dst_zone[:1] == "$":
+          dst_zone = sub_vars(dst_zone)
+        else:
+          dst_zone                                          = (dst_zone,)
 
     if isinstance(params, str):
         raise TypeError("params must be a list or tuple")
